@@ -24,7 +24,7 @@ public class SecurityConfigurationFilterChain {
     SecurityFilter securityFilter;
 
     @Bean // Adicione @Bean para que o Spring gerencie este SecurityFilterChain
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable) // Desabilita CSRF para APIs REST
                 .sessionManagement(
@@ -34,11 +34,11 @@ public class SecurityConfigurationFilterChain {
                         authorize ->
                                 authorize
                                         // Permite acesso público a todas as rotas do Swagger UI e OpenAPI docs
-                                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-resources", "/configuration/ui", "/configuration/security", "/webjars/**").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-resources", "/configuration/ui", "/configuration/security", "/webjars/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/").permitAll() // Exemplo: se a raiz for uma página inicial pública
                                         // Qualquer outra requisição exige autenticação
                                         .anyRequest().authenticated())
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

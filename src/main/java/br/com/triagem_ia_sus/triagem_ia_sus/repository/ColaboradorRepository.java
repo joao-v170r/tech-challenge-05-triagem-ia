@@ -5,6 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface ColaboradorRepository extends MongoRepository<Colaborador, String> {
-    Colaborador findByEmail(String email);
-    UserDetails findByEmailWithDetails(String email);
+    UserDetails findByEmail(String email);
 }

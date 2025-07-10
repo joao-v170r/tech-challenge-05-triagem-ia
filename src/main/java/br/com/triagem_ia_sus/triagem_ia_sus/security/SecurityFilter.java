@@ -31,7 +31,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if(token != null) {
             var login = tokenService.validateToken(token);
-            UserDetails userDetails = colaboradorRepository.findByEmailWithDetails(login);
+            UserDetails userDetails = colaboradorRepository.findByEmail(login);
 
             var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
