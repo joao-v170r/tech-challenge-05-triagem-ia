@@ -1,8 +1,8 @@
 package br.com.triagem_ia_sus.triagem_ia_sus.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean; // Importar Bean
-import org.springframework.context.annotation.Configuration; // Mudar @Configurable para @Configuration
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -16,27 +16,35 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Configuration // Use @Configuration para classes de configuração Spring
+// **Novas importações para o Swagger UI/OpenAPI**
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+
+
+@Configuration
 @EnableWebSecurity
 public class SecurityConfigurationFilterChain {
 
     @Autowired
     SecurityFilter securityFilter;
 
-    @Bean // Adicione @Bean para que o Spring gerencie este SecurityFilterChain
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable) // Desabilita CSRF para APIs REST
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(
                         session ->
-                                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Define a política de sessão como STATELESS
+                                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
                                         // Permite acesso público a todas as rotas do Swagger UI e OpenAPI docs
-                                        .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-resources", "/configuration/ui", "/configuration/security", "/webjars/**").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/").permitAll() // Exemplo: se a raiz for uma página inicial pública
-                                        // Qualquer outra requisição exige autenticação
+                                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-resources", "/configuration/ui", "/configuration/security", "/webjars/**").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/").permitAll()
+                                        // **Adicione aqui a rota de autenticação se tiver uma, para permitir acesso sem token**
+                                        // Exemplo: .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -50,5 +58,18 @@ public class SecurityConfigurationFilterChain {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // **Novo Bean para configurar o OpenAPI com segurança JWT**
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth", // Nome do esquema de segurança
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth")); // Aplica o esquema globalmente
     }
 }
