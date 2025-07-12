@@ -1,15 +1,11 @@
-package br.com.triagem_ia_sus.triagem_ia_sus.controller;
+package br.com.triagem_ia_sus.triagem_ia_sus.controller.paciente;
 
 
-import br.com.triagem_ia_sus.triagem_ia_sus.domain.Colaborador;
 import br.com.triagem_ia_sus.triagem_ia_sus.dto.UserAuthDTO;
-import br.com.triagem_ia_sus.triagem_ia_sus.dto.UserResponseDTO;
-import br.com.triagem_ia_sus.triagem_ia_sus.security.TokenService;
 import br.com.triagem_ia_sus.triagem_ia_sus.useCase.AuthenticationUseCase;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

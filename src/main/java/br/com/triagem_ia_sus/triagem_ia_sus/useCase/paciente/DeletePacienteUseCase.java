@@ -1,4 +1,4 @@
-package br.com.triagem_ia_sus.triagem_ia_sus.useCase;
+package br.com.triagem_ia_sus.triagem_ia_sus.useCase.paciente;
 
 import br.com.triagem_ia_sus.triagem_ia_sus.domain.Paciente;
 import br.com.triagem_ia_sus.triagem_ia_sus.repository.PacienteRepository;

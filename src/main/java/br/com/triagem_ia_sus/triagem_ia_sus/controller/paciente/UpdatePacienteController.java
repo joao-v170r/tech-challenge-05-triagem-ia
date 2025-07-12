@@ -1,8 +1,8 @@
-package br.com.triagem_ia_sus.triagem_ia_sus.controller;
+package br.com.triagem_ia_sus.triagem_ia_sus.controller.paciente;
 
-import br.com.triagem_ia_sus.triagem_ia_sus.dto.InputUpdatePacienteDTO;
-import br.com.triagem_ia_sus.triagem_ia_sus.dto.PacienteDTO;
-import br.com.triagem_ia_sus.triagem_ia_sus.useCase.UpdatePacienteUseCase;
+import br.com.triagem_ia_sus.triagem_ia_sus.dto.paciente.InputUpdatePacienteDTO;
+import br.com.triagem_ia_sus.triagem_ia_sus.dto.paciente.PacienteDTO;
+import br.com.triagem_ia_sus.triagem_ia_sus.useCase.paciente.UpdatePacienteUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;

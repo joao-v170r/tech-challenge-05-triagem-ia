@@ -1,6 +1,6 @@
-package br.com.triagem_ia_sus.triagem_ia_sus.useCase;
+package br.com.triagem_ia_sus.triagem_ia_sus.useCase.paciente;
 
-import br.com.triagem_ia_sus.triagem_ia_sus.dto.PacienteDTO;
+import br.com.triagem_ia_sus.triagem_ia_sus.dto.paciente.PacienteDTO;
 import br.com.triagem_ia_sus.triagem_ia_sus.repository.PacienteRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;

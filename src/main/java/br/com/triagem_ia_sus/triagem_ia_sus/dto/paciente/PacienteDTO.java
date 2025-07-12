@@ -1,4 +1,4 @@
-package br.com.triagem_ia_sus.triagem_ia_sus.dto;
+package br.com.triagem_ia_sus.triagem_ia_sus.dto.paciente;
 
 import br.com.triagem_ia_sus.triagem_ia_sus.domain.Paciente;
 
