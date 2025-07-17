@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  tech-challeger-05-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tech-challeger-05-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:admin123@mongodb-tech-challeger-05:27017/db_pedido?authSource=admin
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      mongodb-tech-challeger-05:
+        condition: service_healthy
+    networks:
+      - tech-challeger-05-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mongodb-tech-challeger-05:
+    image: mongo:7.0
+    container_name: mongodb-tech-challeger-05
+    ports:
+      - "27017:27017"  # Porta externa 27018 → Interna 27017
+    volumes:
+      - mongodb_tech_challeger_05_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=db_triagem_ia
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+    networks:
+      - tech-challeger-05-network
+    restart: unless-stopped
+networks:
+  tech-challeger-05-network:
+    driver: bridge
+    name: tech-challeger-05-network  # Nome explícito para conexão entre serviços
+volumes:
+  mongodb_tech_challeger_05_data:

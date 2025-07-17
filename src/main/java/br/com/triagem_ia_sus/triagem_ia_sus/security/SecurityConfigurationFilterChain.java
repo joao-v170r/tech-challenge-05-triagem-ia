@@ -43,6 +43,8 @@ public class SecurityConfigurationFilterChain {
                                         // Permite acesso público a todas as rotas do Swagger UI e OpenAPI docs
                                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-resources", "/configuration/ui", "/configuration/security", "/webjars/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/create-colaborador").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                                         // **Adicione aqui a rota de autenticação se tiver uma, para permitir acesso sem token**
                                         // Exemplo: .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                                         .anyRequest().authenticated())
