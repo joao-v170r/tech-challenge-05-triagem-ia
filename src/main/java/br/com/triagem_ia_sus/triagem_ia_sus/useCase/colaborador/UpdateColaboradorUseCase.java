@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @AllArgsConstructor
@@ -25,11 +25,13 @@ public class UpdateColaboradorUseCase {
             colaborador.setNome(dto.nome());
         }
 
-        if (dto.dateTimeNascimento() != null) {
-            if(LocalDate.parse(dto.dateTimeNascimento()).isAfter(LocalDate.now())) {
-                throw new RuntimeException("Data de nascimento inválida", new IllegalAccessException("A data de nascimento não pode ser uma data futura"));
+        if (dto.dataNascimento() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(java.util.Locale.forLanguageTag("pt-BR"));
+            LocalDate dataNascimento = LocalDate.parse(dto.dataNascimento(), formatter);
+            if (dataNascimento.isAfter(LocalDate.now())) {
+                throw new RuntimeException("Data de nascimento invalida", new IllegalAccessException("A data de nascimento não pode ser uma data futura"));
             }
-            colaborador.setDateTimeNascimento(LocalDateTime.parse(dto.dateTimeNascimento()));
+            colaborador.setDataNascimento(dataNascimento);
         }
 
         if (dto.email() != null) {
@@ -37,7 +39,12 @@ public class UpdateColaboradorUseCase {
         }
 
         if (dto.tipoColaborador() != null) {
-            colaborador.setTipo(TipoColaborador.valueOf(dto.tipoColaborador()));
+            try {
+                TipoColaborador tipoColaborador = TipoColaborador.valueOf(dto.tipoColaborador());
+                colaborador.setTipoColaborador(tipoColaborador);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Tipo de colaborador inválido: " + dto.tipoColaborador());
+            }
         }
 
         return new ColaboradorDTO(repository.save(colaborador));

@@ -25,7 +25,7 @@ public class ReadColaboradorController {
 
     @GetMapping
     @Operation(summary = "Lista todos os colaboradores")
-    public ResponseEntity<Page<ColaboradorDTO>> findAll(@RequestBody Pageable pageable) {
+    public ResponseEntity<Page<ColaboradorDTO>> findAll(Pageable pageable) {
         return ResponseEntity.ok(useCase.findAll(pageable));
     }
 }

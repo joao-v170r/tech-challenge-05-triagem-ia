@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,15 +18,15 @@ import java.util.List;
 public class Colaborador implements UserDetails {
     private String id;
     private String nome;
-    private LocalDateTime dateTimeNascimento;
+    private LocalDate dataNascimento;
     @Indexed(unique = true)
     private String email;
     private String senhaHash;
-    private TipoColaborador tipo;
+    private TipoColaborador tipoColaborador;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.tipo.getRole().equals(Roles.ADMIN.name())) return List.of(
+        if(this.tipoColaborador.getRole().equals(Roles.ADMIN.name())) return List.of(
                 new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER")
         );
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
