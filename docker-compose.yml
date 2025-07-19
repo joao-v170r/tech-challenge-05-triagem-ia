@@ -8,7 +8,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://admin:admin123@mongodb-tech-challeger-05:27017/db_pedido?authSource=admin
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:admin123@mongodb-tech-challeger-05:27017/db_triagem_ia?authSource=admin
       - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       mongodb-tech-challeger-05:
