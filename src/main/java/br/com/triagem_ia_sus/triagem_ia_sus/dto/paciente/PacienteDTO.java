@@ -8,7 +8,7 @@ public record PacienteDTO(
         String id,
         String nome,
         String cpf,
-        LocalDate dtNascimento,
+        LocalDate dataNascimento,
         String endereco,
         String telefone
 ) {
@@ -21,7 +21,7 @@ public record PacienteDTO(
                 paciente.getId(),
                 paciente.getNome(),
                 paciente.getCpf(),
-                paciente.getDtNascimento(),
+                paciente.getDataNascimento(),
                 paciente.getEndereco(),
                 paciente.getTelefone()
         );

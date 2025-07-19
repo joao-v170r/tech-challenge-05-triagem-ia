@@ -16,18 +16,18 @@ public class UpdatePacienteUseCase {
 
     public PacienteDTO update(String id, InputUpdatePacienteDTO dto) {
         Paciente paciente = repository.findById(id).orElseThrow(
-                () -> new RuntimeException("paciente não existe", new IllegalArgumentException("id não encontrado"))
+                () -> new RuntimeException("Paciente não existe", new IllegalArgumentException("id não encontrado"))
         );
 
         if(dto.nome() != null) {
             paciente.setNome(dto.nome());
         }
 
-        if(dto.dtNascimento() != null) {
-            if(LocalDate.parse(dto.dtNascimento()).isAfter(LocalDate.now())) {
-                throw new RuntimeException("data de nascimento invalida", new IllegalAccessException("a data de nascimento nao pode ser uma data futura"));
+        if(dto.dataNascimento() != null) {
+            if(LocalDate.parse(dto.dataNascimento()).isAfter(LocalDate.now())) {
+                throw new RuntimeException("Data de nascimento invalida", new IllegalAccessException("A data de nascimento não pode ser uma data futura"));
             }
-            paciente.setDtNascimento(LocalDate.parse(dto.dtNascimento()));
+            paciente.setDataNascimento(LocalDate.parse(dto.dataNascimento()));
         }
 
         if(dto.endereco() != null) {

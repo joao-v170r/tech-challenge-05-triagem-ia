@@ -26,7 +26,6 @@ public class CreateColaboradorUseCase {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(java.util.Locale.forLanguageTag("pt-BR"));
         LocalDate dataNascimento = LocalDate.parse(dto.dataNascimento(), formatter);
-
         if (dataNascimento.isAfter(LocalDate.now())) {
             throw new RuntimeException("Data de nascimento invalida", new IllegalAccessException("A data de nascimento não pode ser uma data futura"));
         }

@@ -25,7 +25,7 @@ public class ReadPacienteController {
 
     @GetMapping
     @Operation(summary = "lista todos os pacientes")
-    public ResponseEntity<Page<PacienteDTO>> findAll(@RequestBody Pageable pageable) {
+    public ResponseEntity<Page<PacienteDTO>> findAll(Pageable pageable) {
         return ResponseEntity.ok(useCase.findAll(pageable));
     }
 }

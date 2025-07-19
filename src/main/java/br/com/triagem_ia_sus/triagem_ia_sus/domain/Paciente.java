@@ -26,7 +26,7 @@ public class Paciente {
     @Indexed(unique = true)
     @EqualsAndHashCode.Include
     private String cpf;
-    private LocalDate dtNascimento;
+    private LocalDate dataNascimento;
     private String endereco;
     private String telefone;
 }
