@@ -43,6 +43,7 @@ public class SecurityConfigurationFilterChain {
                                         .requestMatchers(HttpMethod.GET, "/").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/create-colaborador").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                                        .requestMatchers("/h2-console/**").permitAll()
                                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

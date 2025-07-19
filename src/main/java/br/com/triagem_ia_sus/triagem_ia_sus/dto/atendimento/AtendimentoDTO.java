@@ -2,7 +2,6 @@ package br.com.triagem_ia_sus.triagem_ia_sus.dto.atendimento;
 
 import br.com.triagem_ia_sus.triagem_ia_sus.domain.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 public record AtendimentoDTO(
         String id,
@@ -18,8 +17,7 @@ public record AtendimentoDTO(
         String observacaoAtendimentoEspecializado,
         Colaborador responsavelTriagem,
         Colaborador responsavelAtendimento,
-        CanalAtendimento canalAtendimento,
-        Set<Mensagem> mensagens
+        CanalAtendimento canalAtendimento
 ) {
     public AtendimentoDTO(Atendimento atendimento) {
         this(
@@ -36,8 +34,7 @@ public record AtendimentoDTO(
                 atendimento.getObservacaoAtendimentoEspecializado(),
                 atendimento.getResponsavelTriagem(),
                 atendimento.getResponsavelAtendimento(),
-                atendimento.getCanalAtendimento(),
-                atendimento.getMensagens()
+                atendimento.getCanalAtendimento()
         );
     }
 }
