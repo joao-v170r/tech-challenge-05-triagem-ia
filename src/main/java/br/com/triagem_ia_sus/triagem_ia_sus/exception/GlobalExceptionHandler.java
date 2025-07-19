@@ -15,7 +15,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Formato padrão para respostas de erro
     private Map<String, Object> createErrorResponse(HttpStatus status, String message, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -26,7 +25,6 @@ public class GlobalExceptionHandler {
         return body;
     }
 
-    // 400 - Argumentos inválidos
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleInvalidArgument(IllegalArgumentException ex, WebRequest request) {
@@ -35,7 +33,6 @@ public class GlobalExceptionHandler {
                 .body(createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
     }
 
-    // 422 - Validação de campos (Spring Validation)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
@@ -57,6 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+        /*ex.printStackTrace(System.err); // Isso imprimirá o stack trace completo no System.err*/
         return ResponseEntity
                 .internalServerError()
                 .body(createErrorResponse(

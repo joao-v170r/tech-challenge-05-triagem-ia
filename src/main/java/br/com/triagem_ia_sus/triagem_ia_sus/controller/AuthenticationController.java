@@ -1,10 +1,9 @@
 package br.com.triagem_ia_sus.triagem_ia_sus.controller;
 
-
 import br.com.triagem_ia_sus.triagem_ia_sus.dto.UserAuthDTO;
 import br.com.triagem_ia_sus.triagem_ia_sus.useCase.AuthenticationUseCase;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("auth")
+@AllArgsConstructor
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationUseCase useCase;
+    private final AuthenticationUseCase useCase;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid UserAuthDTO data){
