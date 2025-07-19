@@ -16,7 +16,7 @@ public class Paciente {
     private String nome;
     @Indexed(unique = true)
     private String cpf;
-    private LocalDate dtNascimento;
+    private LocalDate dataNascimento;
     private String endereco;
     private String telefone;
 }

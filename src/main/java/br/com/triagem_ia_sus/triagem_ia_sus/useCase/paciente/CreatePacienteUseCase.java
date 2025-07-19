@@ -16,11 +16,11 @@ public class CreatePacienteUseCase {
     private final PacienteRepository repository;
 
     public PacienteDTO create(InputCreatePacienteDTO dto) {
-        if(repository.findByCpf(dto.cpf()).isPresent()) {
+        if (repository.findByCpf(dto.cpf()).isPresent()) {
             throw new RuntimeException("ja existe um paciente com esse cpf");
         }
 
-        if(LocalDate.parse(dto.dtNascimento()).isAfter(LocalDate.now())) {
+        if (LocalDate.parse(dto.dtNascimento()).isAfter(LocalDate.now())) {
             throw new RuntimeException("data de nascimento invalida", new IllegalAccessException("a data de nascimento nao pode ser uma data futura"));
         }
 
