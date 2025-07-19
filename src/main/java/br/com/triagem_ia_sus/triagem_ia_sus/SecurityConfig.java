@@ -1,3 +1,4 @@
+/*
 package br.com.triagem_ia_sus.triagem_ia_sus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,4 +13,4 @@ public class SecurityConfig {
                 .authorizeHttpRequests().anyRequest().permitAll();
         return http.build();
     }
-}
+}*/

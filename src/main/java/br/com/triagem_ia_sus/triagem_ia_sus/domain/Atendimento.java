@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,13 +23,13 @@ public class Atendimento {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Paciente paciente;
-    private LocalDateTime datahoraInicioAtendimento;
+    private LocalDateTime dataHoraInicioAtendimento;
     private String sintomasRelatados;
     private AgenteIA agenteIA;
     private StatusAtendimento status;
-    private ClassificacaoRisco classificacaoPaciente;
+    private ClassificacaoRisco classificacaoRiscoIa;
     private ClassificacaoRisco classificacaoFinal;
-    private LocalDateTime datahoraTriagem;
+    private LocalDateTime dataHoraInicioTriagem;
     private String observacaoTriagemEspecializada;
     private String observacaoAtendimentoEspecializado;
     @DBRef
@@ -38,7 +40,10 @@ public class Atendimento {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Colaborador responsavelAtendimento;
-    private String observacaoAtendimentoIA;
-    private String resumoHistoricoIA;
+    /*private String observacaoAtendimentoIA;
+    private String resumoHistoricoIA;*/
     private CanalAtendimento canalAtendimento;
+    @DBRef
+    @EqualsAndHashCode.Exclude
+    private Set<Mensagem> mensagens = new HashSet<>();
 }
