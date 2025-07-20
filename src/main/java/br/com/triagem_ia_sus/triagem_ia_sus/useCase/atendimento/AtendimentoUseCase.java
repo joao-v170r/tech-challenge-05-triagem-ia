@@ -45,7 +45,8 @@ public class AtendimentoUseCase {
                     .stream()
                     .max(Comparator.comparingInt(Mensagem::getNumeroSequencial))
                     .orElse(null);
-            return ultimaMensagem.getTexto();
+            // Adicione uma verificação de nulo aqui também para evitar NullPointerException
+            return ultimaMensagem != null ? ultimaMensagem.getTexto() : "Atendimento concluído, mas sem mensagem final.";
         }
 
 //        System.out.println("ID do Atendimento:");
@@ -137,28 +138,53 @@ public class AtendimentoUseCase {
         String responseBody = response.body();
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = null;
+        JsonNode root;
         try {
             root = mapper.readTree(responseBody);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Erro ao parsear resposta da IA: " + responseBody, e);
         }
-        String text = root.path("candidates")
-                .get(0)
-                .path("content")
-                .path("parts")
-                .get(0)
-                .path("text")
-                .asText();
+
+        String text = "Não foi possível obter uma resposta válida da IA."; // Mensagem padrão
+
+        // Navegação segura na árvore JSON
+        JsonNode candidatesNode = root.path("candidates");
+        if (candidatesNode.isArray() && candidatesNode.size() > 0) {
+            JsonNode firstCandidate = candidatesNode.get(0); // Acessa o primeiro elemento do array "candidates"
+            JsonNode contentNode = firstCandidate.path("content"); // Acessa o nó "content"
+            JsonNode partsNode = contentNode.path("parts"); // Acessa o nó "parts"
+
+            if (partsNode.isArray() && partsNode.size() > 0) {
+                JsonNode firstPart = partsNode.get(0); // Acessa o primeiro elemento do array "parts"
+                JsonNode textNode = firstPart.path("text"); // Acessa o nó "text"
+
+                // Verifica se o nó de texto existe e não é nulo
+                if (!textNode.isMissingNode() && !textNode.isNull()) {
+                    text = textNode.asText();
+                }
+            }
+        } else {
+            // Adicionado tratamento para erros explícitos da IA, se existirem na raiz da resposta
+            JsonNode errorNode = root.path("error");
+            if (!errorNode.isMissingNode() && !errorNode.isNull()) {
+                text = "Erro retornado pela IA: " + errorNode.path("message").asText("Mensagem de erro desconhecida.");
+            } else {
+                // Fallback para quando não há 'candidates' e nenhum erro explícito
+                text = "A IA não conseguiu gerar uma resposta no formato esperado. Resposta bruta: " + responseBody;
+            }
+        }
+
         return text.replaceAll("(?s)```json\\s*|```", "").trim();
     }
 
     public String gerarPayload(Atendimento atendimento) {
+        ObjectMapper mapper = new ObjectMapper(); // Instância do ObjectMapper
+
         String template = """
             {
                 "role": "%s",
                 "parts": [{
-                    "text": "%s"
+                    "text": %s
                 }]
             }""";
         return """
@@ -170,11 +196,20 @@ public class AtendimentoUseCase {
             """.formatted(
                 atendimento.getMensagens().stream()
                         .sorted(java.util.Comparator.comparingInt(Mensagem::getNumeroSequencial))
-                        .map(m -> template.formatted(
-                                        m.getRoleMensagem().name().toLowerCase(),
-                                        m.getTexto().replace("\"", "\\\"")
-                                )
-                        )
+                        .map(m -> {
+                            String escapedText = null;
+                            try {
+                                // Escapa a string para JSON, adicionando aspas e tratando caracteres especiais
+                                escapedText = mapper.writeValueAsString(m.getTexto());
+                            } catch (JsonProcessingException e) {
+                                // Trata o erro de processamento JSON, se ocorrer
+                                throw new RuntimeException("Erro ao escapar string JSON para a IA: " + m.getTexto(), e);
+                            }
+                            return template.formatted(
+                                    m.getRoleMensagem().name().toLowerCase(),
+                                    escapedText
+                            );
+                        })
                         .collect(java.util.stream.Collectors.joining(",\n"))
         );
     }

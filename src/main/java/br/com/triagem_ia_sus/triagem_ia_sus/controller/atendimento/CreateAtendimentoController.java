@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,7 @@ public class CreateAtendimentoController {
 
     @PostMapping
     @Operation(summary = "Cria atendimento")
-    public ResponseEntity<AtendimentoDTO> create(InputCreateAtendimentoDTO request) {
+    public ResponseEntity<AtendimentoDTO> create(@RequestBody InputCreateAtendimentoDTO request) {
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(useCase.create(request));
     }
 }
