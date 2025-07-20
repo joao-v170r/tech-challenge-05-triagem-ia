@@ -6,7 +6,10 @@ import br.com.triagem_ia_sus.triagem_ia_sus.dto.atendimento.InputUpdateAtendimen
 import br.com.triagem_ia_sus.triagem_ia_sus.repository.AtendimentoRepository;
 import br.com.triagem_ia_sus.triagem_ia_sus.repository.ColaboradorRepository;
 import br.com.triagem_ia_sus.triagem_ia_sus.repository.PacienteRepository;
+import br.com.triagem_ia_sus.triagem_ia_sus.security.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,11 +18,15 @@ import java.time.format.DateTimeFormatter;
 @Service
 @AllArgsConstructor
 public class UpdateAtendimentoUseCase {
+    @Autowired
+    private TokenService tokenService;
     private final AtendimentoRepository atendimentoRepository;
     private final PacienteRepository pacienteRepository;
     private final ColaboradorRepository colaboradorRepository;
 
-    public AtendimentoDTO update(String id, InputUpdateAtendimentoDTO dto) {
+    public AtendimentoDTO update(String id,
+                                 InputUpdateAtendimentoDTO dto,
+                                 HttpServletRequest httpRequest) {
 
         Atendimento atendimento = atendimentoRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Atendimento não existe", new IllegalArgumentException("Id não encontrado"))
@@ -58,20 +65,26 @@ public class UpdateAtendimentoUseCase {
             atendimento.setObservacaoAtendimentoEspecializado(dto.observacaoAtendimentoEspecializado());
         }
 
-        if (dto.responsavelTriagemId() != null) {
-            Colaborador responsavelTriagem = colaboradorRepository.findById(dto.responsavelTriagemId()).orElseThrow(
-                    () -> new RuntimeException("Responsável triagem não existe", new IllegalArgumentException("Id não encontrado"))
-            );
-            atendimento.setResponsavelTriagem(responsavelTriagem);
+        if (dto.responsavelTriagem() == Boolean.TRUE) {
+            atendimento.setResponsavelTriagem(obterColaborador(httpRequest));
         }
 
-        if (dto.responsavelAtendimentoId() != null) {
-            Colaborador responsavelAtendimento = colaboradorRepository.findById(dto.responsavelAtendimentoId()).orElseThrow(
-                    () -> new RuntimeException("Responsável atendimento não existe", new IllegalArgumentException("Id não encontrado"))
-            );
-            atendimento.setResponsavelAtendimento(responsavelAtendimento);
+        if (dto.responsavelAtendimento() == Boolean.TRUE) {
+            atendimento.setResponsavelAtendimento(obterColaborador(httpRequest));
         }
 
         return new AtendimentoDTO(atendimentoRepository.save(atendimento));
     }
+
+    public Colaborador obterColaborador(HttpServletRequest httpRequest) {
+        try {
+            String authorizationHeader = httpRequest.getHeader("Authorization");
+            String token = authorizationHeader.substring(7);
+            String login = tokenService.validateToken(token);
+            return colaboradorRepository.findByEmail(login);
+        } catch (Exception e) {
+            throw new RuntimeException("Colaborador não existe", new IllegalArgumentException("Erro ao recuperar colaborador"));
+        }
+    }
+
 }
