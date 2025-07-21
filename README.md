@@ -133,6 +133,8 @@ O projeto segue a arquitetura de camadas comum em aplicações Spring Boot:
 
 O projeto deste repositório se trata apenas da aplicação spring boot, que se comunica com a api do Gemini para realizar a triagem dos pacientes, e de um banco de dados em mongoDB. 
 
+O repositório do serviço em Python que se comunica diretamente com a API do Telegram pode ser acessado em `https://github.com/joao-v170r/client-bot-telegram-python-triagem-ai`.
+
 ## Endpoints da API
 
 A documentação interativa da API estará disponível via Swagger UI após a inicialização da aplicação em:
