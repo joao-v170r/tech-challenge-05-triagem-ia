@@ -8,7 +8,7 @@ import br.com.triagem_ia_sus.triagem_ia_sus.repository.PacienteRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,12 +25,27 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
 public class AtendimentoUseCase {
+
+    @Value("${gemini.api.url}")
+    private String url;
+
+    @Value("${gemini.api.key}")
+    private String apiKey;
 
     private final MensagemRepository mensagemRepository;
     private final AtendimentoRepository atendimentoRepository;
     private final PacienteRepository pacienteRepository;
+
+    public AtendimentoUseCase(
+            MensagemRepository mensagemRepository,
+            AtendimentoRepository atendimentoRepository,
+            PacienteRepository pacienteRepository
+    ) {
+        this.mensagemRepository = mensagemRepository;
+        this.atendimentoRepository = atendimentoRepository;
+        this.pacienteRepository = pacienteRepository;
+    }
 
     public String atendimento(RealizarAtendimentoIaDTO dto) {
 
@@ -116,9 +131,6 @@ public class AtendimentoUseCase {
     }
 
     public String requisicaoIa(String payload) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-        String apiKey = "AIzaSyDlvzTMe2nRUkHME8vEaAcFCXLy49DPkSE";
-
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url + "?key=" + apiKey))

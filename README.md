@@ -53,27 +53,30 @@ As configurações de conexão com o MongoDB podem ser encontradas em `src/main/
 ```properties
 spring.data.mongodb.host=localhost
 spring.data.mongodb.port=27017
-spring.data.mongodb.database=microservice_db
+spring.data.mongodb.database=db_triagem_ia
 # Para Docker Compose, a URI completa está no docker-compose.yml:
 # - SPRING_DATA_MONGODB_URI=mongodb://admin:admin123@mongodb-tech-challeger-05:27017/db_triagem_ia?authSource=admin
 ```
 
 ### 3\. Variáveis de Ambiente
 
-A aplicação requer uma chave de API para a integração com o modelo Gemini (IA). Esta chave deve ser configurada como uma variável de ambiente ou no arquivo `application.properties`:
+A aplicação requer uma chave para o token JWT e de API para a integração com o modelo Gemini (IA). Estas chaves devem ser configurada como uma variável de ambiente ou no arquivo `application.properties`:
 
+A chave do token JWT pode ser gerada em um site como [JWT Secret Key Generator](https://jwtsecretkeygenerator.com/pt/), e deve ser especificada em `api.secure.token.secret` em `application.properties`:
 ```properties
 api.secure.token.secret=ZpTd0NhIBisSQY7LAZKD6SNBNxyJSGpa
 ```
 
-A linha `api.secure.token.secret` em `application.properties` é usada para o JWT.
-
-A chave da API do Gemini é configurada diretamente no `AtendimentoUseCase.java` e não deve ser exposta publicamente em um ambiente de produção. Recomenda-se o uso de um sistema de gerenciamento de segredos para a chave da API do Gemini.
-
-```java
-// Em src/main/java/br/com/triagem_ia_sus/triagem_ia_sus/useCase/atendimento/AtendimentoUseCase.java
-String apiKey = "AIzaSyDlvzTMe2nRUkHME8vEaAcFCXLy49DPkSE"; // ESTA CHAVE NÃO DEVE SER EXPOSTA EM PRODUÇÃO
+A chave do Gemini e o modelo do Gemini podem ser obtidos em [Gemini Developer API Pricing](https://ai.google.dev/gemini-api/docs/pricing), e devem ser especicados em `gemini.api.url` e `gemini.api.key` em `application.properties`:
+```properties
+gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+gemini.api.key=AIzaSyDlvzTMe2nRUkHME8vEaAcFCXLy49DPkSE
 ```
+No caso, utilizamos o Gemini 2.0 Flash.
+
+Essas chaves devem ser armazenadas no ambiente e não devem ser exposta publicamente em um ambiente de produção. Estão em `application.properties` apenas para fins de desenvolvimento e testes. 
+
+A chave do Gemini no `application properties` está desativada, e uma nova chave nova deve ser gerada para utilizar a aplicação.
 
 ## Como Rodar o Projeto
 
@@ -105,6 +108,8 @@ java -jar target/triagem-ia-sus-0.0.1-SNAPSHOT.jar
 
 A aplicação estará acessível em `http://localhost:8080`.
 
+A aplicação pode ser utilizada com swagger em `http://localhost:8080/swagger-ui/index.html`.
+
 ## Estrutura do Projeto
 
 O projeto segue a arquitetura de camadas comum em aplicações Spring Boot:
@@ -119,6 +124,14 @@ O projeto segue a arquitetura de camadas comum em aplicações Spring Boot:
 * **`src/main/resources/application.properties`**: Arquivo de configuração da aplicação.
 * **`Dockerfile`**: Definição para construção da imagem Docker da aplicação.
 * **`docker-compose.yml`**: Configuração dos serviços Docker (aplicação e MongoDB).
+
+## Arquitetura do Projeto
+
+<div align="center">
+    <img src="src/main/resources/img/arquitetura.png" width="624px" height="255px">
+</div>
+
+O projeto deste repositório se trata apenas da aplicação spring boot, que se comunica com a api do Gemini para realizar a triagem dos pacientes, e de um banco de dados em mongoDB. 
 
 ## Endpoints da API
 
@@ -154,6 +167,75 @@ Alguns dos principais endpoints incluem:
     * `PUT /update-atendimento/{id}`: Atualiza um atendimento existente.
     * `DELETE /delete-atendimento/{id}`: Deleta um atendimento.
 
+## Fluxo Principal
+
+Como paciente, você apenas precisa enviar uma requisição para `POST /realizar-atendimento` com o campo de `mensagem`:
+
+Exemplo de envio:
+```
+ {
+  "mensagem": "teste"
+ }
+```
+
+Exemplo de resposta:
+```
+{
+  "idAtendimento": "687ece8780400e82a06845b5",
+  "nome": null,
+  "cpf": null,
+  "dataNascimento": null,
+  "telefone": null,
+  "endereco": null,
+  "sintomasRecente": null,
+  "classificacaoUrgencia": null,
+  "mensagem": "Olá! Bem-vindo(a) à Clínica do SUS. Meu nome é Tina e sou sua assistente virtual de triagem inicial. Estou aqui para te ajudar a agilizar seu atendimento. Para começar, preciso coletar algumas informações. \n\nPrimeiramente, qual é o seu nome completo?",
+  "atendimentoConcluido": "Não"
+}
+```
+
+Na resposta você receberá uma mensagem inicial e o idAtendimento. Nos envios subsequentes, você deverá repassar o campo de `id` com o valor de `idAtendimento` para a IA receber todo o histórico do atendimento e continuar a triagem.
+
+Exemplo de envio:
+```
+{
+  "id": "687ece8780400e82a06845b5"
+  "mensagem": "Nome Teste"
+}
+```
+
+Exemplo de resposta:
+```
+{
+  "idAtendimento": "687ece8780400e82a06845b5",
+  "nome": "Nome Teste",
+  "cpf": null,
+  "dataNascimento": null,
+  "telefone": null,
+  "endereco": null,
+  "sintomasRecente": null,
+  "classificacaoUrgencia": null,
+  "mensagem": "Obrigada, Nome Teste! Agora, por favor, poderia me informar o seu CPF?",
+  "atendimentoConcluido": "Não"
+}
+```
+
+A aplicação possui outros endpoints para listar, criar, atualizar e apagar colaboradores, pacientes e atendimentos. 
+
+Para utilizar estes endpoints, você precisará de um token JWT válido, que pode ser obtido cadastrando um colaborador em `POST /create-colaborador`, com o campo `tipoColaborador` precisando ser `MEDICO` ou `ENFERMEIRO`.
+Exemplo de envio:
+```
+{
+  "nome": "Teste",
+  "dataNascimento": "26/06/1992",
+  "email": "email@email.com",
+  "senha": "senha123",
+  "tipoColaborador": "MEDICO"
+}
+```
+
+Para realizar login com este email e senha no endpoint `POST /auth/login`, e então obter um token de acesso.
+
 ## Próximos Passos e Melhorias Futuras
 
 * **Integração com WhatsApp:** Desenvolver e implementar a integração com a API do WhatsApp para expandir os canais de atendimento.
@@ -165,7 +247,3 @@ Alguns dos principais endpoints incluem:
 ## Licença
 
 Este projeto está licenciado sob a [Nome da Licença, ex: MIT License]. Consulte o arquivo `LICENSE` para mais detalhes.
-
-## Contribuição
-
-Contribuições são bem-vindas\! Por favor, siga as diretrizes de contribuição do projeto e envie pull requests.
